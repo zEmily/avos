@@ -1,0 +1,8 @@
+{
+    "applicationName" : "wifitest",
+    "applicationId": "tikkni781rc9wkr4816u9o1n30dfsz8upb9zmc5vie3wqhwy",
+    "applicationKey": "cc4keusn2d89stk234qgc9qfl627eap8x0p1sot9gntw25io",
+    "global": {
+        "avVersion": "0.3.1"
+    }
+}
