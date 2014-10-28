@@ -1,1 +1,34 @@
-Congrats, you just set up your cloud code project.
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<script>
+			// Initialize variables
+			var connection, connectionSpeed, htmlNode, htmlClass;
+
+			// Create a custom object fallback if navigator.connection isn't available
+			connection = navigator.connection || {'type':'20'};
+			if (navigator.connection) {
+				alert(navigator.connection.type)
+			}
+			// Set connectionSpeed
+			switch(connection.type) {
+				case connection.CELL_3G:
+					alert("|||3g");
+					// 3G
+					connectionSpeed = 'mediumbandwidth';
+					break;
+				case connection.CELL_2G:
+					alert("|||2g");
+					// 2G
+					connectionSpeed = 'lowbandwidth';
+					break;
+				default:
+					alert("|||wifi");
+					// WIFI, ETHERNET, UNKNOWN
+					connectionSpeed = 'highbandwidth';
+			}
+		</script>
+	</head>
+	<body>hello 我是来测试3G还是wifi</body>
+</html>
