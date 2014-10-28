@@ -8,17 +8,24 @@
 					var connection, connectionSpeed, htmlNode, htmlClass;
 
 			// Create a custom object fallback if navigator.connection isn't available
-			connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {type:20};
+			connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || (navigator.network ? navigator.network.connection : {type:20});
 			if (navigator.connection) {
 				alert(navigator.connection.type)
 			}
 			var log = document.createElement('div');
-			log.innerHTML = "connection:" + navigator.connection + " * " + navigator.mozConnection + " * " + navigator.webkitConnection;
+			log.innerHTML = "connection:" + navigator.connection + " * " + navigator.mozConnection + " * " + navigator.webkitConnection + " * " + (navigator.network ? navigator.network.connection : "{type:20}");
 			document.body.appendChild(log);
-				/* chrome 3g : cellular ,
-			* iphone 5s不支持该功能
-			* 三星 4以上系统不行
-			* */
+		/* chrome 3g : cellular ,
+		所有安卓系统的	UC以及小米原生浏览器 都不支持这个功能
+								baidu  浏览器4.3  wifi下走的是 connection[object Connection]，值为 0
+								QQ  浏览器 wifi下走的connection[object Connection]，值为2
+
+
+
+			* 三星 4系统，原生浏览器， wifi情况下走的是 mozConnection[object Connection] wifi下的type为2
+				低端安卓 2.3.6 wifi下走的是connection[object Connection] 值为2
+			*小米： chrome 走的第一个connection[object NetworkInformation]， wifi下显示type为wifi 
+			*/
 			// Set connectionSpeed
 			switch(connection.type) {
 				case connection.CELL_3G:
