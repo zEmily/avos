@@ -1,3 +1,1 @@
-avos
-我只是为了测试小东西
-====
+Cloud code project for wifitest. Cloud Code Guide: https://cn.avoscloud.com/docs/cloud_code_guide.html
