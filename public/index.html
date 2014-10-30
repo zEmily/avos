@@ -11,6 +11,8 @@
 			connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || (navigator.network ? navigator.network.connection : {type:20});
 			if (navigator.connection) {
 				alert(navigator.connection.type)
+				alert(connection.type == '2')
+				alert(connection.type == 2)
 			}
 			var log = document.createElement('div');
 			log.innerHTML = "connection:" + navigator.connection + " * " + navigator.mozConnection + " * " + navigator.webkitConnection + " * " + (navigator.network ? navigator.network.connection : "{type:20}") + "|||||" + connection;
@@ -19,15 +21,15 @@
 							3g : cellular ,
 		所有安卓系统的	UC、小米原生浏览器 都不支持这个功能
 								微信内置的浏览器没有该功能
-		iphone上的safari是不支持这个功能
-		TODO： 需要看下iphone上的UC和chrome的是否正常
+		iOS 上的所有浏览器都不可以这样子
 
 								baidu  浏览器4.3  wifi下走的是 connection[object Connection]，值为 0
 																	3g  值为0
 								QQ  浏览器 wifi下走的connection[object Connection]，值为2
 													3g 值为4 connection.CELL_3G
 
-			* 三星 4系统，原生浏览器， wifi情况下走的是 mozConnection[object Connection] wifi下的type为2
+			* 高级三星浏览器是不支持这个功能的
+				三星 4系统，原生浏览器， wifi情况下走的是 connection[object Connection] wifi下的type为2
 				低端安卓 2.3.6 wifi下走的是connection[object Connection] 值为2
 			* 
 			*/
