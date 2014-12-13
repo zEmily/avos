@@ -6,22 +6,28 @@
 			div.outline {
 				position: relative;
 				width: 379px;
+				height: 794px;
 				background-image: url("/iPhone.png");
 				background-size: 379px auto;
 			}
-			img.content {
+			div.content {
 				width:320px;
 				height: 569px;
-				overflow: hidden;
+				overflow: scroll;
 				position: absolute;
-				left: 28px;
-				top: 113px;
+				left: 31px;
+				top: 116px;
+			}
+			.content img {
+				width: 320px;
 			}
 		</style>
 	</head>
 	<body>
 		<div class="outline">
-			<img class="content" src="/content.png">
+			<div class="content">
+				<img src="/content.jpg">
+			</div>
 		</div>
 	</body>
 </html>
