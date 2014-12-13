@@ -2,10 +2,26 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+		<style>
+			div.outline {
+				position: relative;
+				width: 379px;
+				background-image: url("/iPhone.png");
+				background-size: 379px auto;
+			}
+			img.content {
+				width:320px;
+				height: 569px;
+				overflow: hidden;
+				position: absolute;
+				left: 28px;
+				top: 113px;
+			}
+		</style>
 	</head>
 	<body>
-
-		<img src="/iPhone.png">
+		<div class="outline">
+			<img class="content" src="/content.png">
+		</div>
 	</body>
 </html>
