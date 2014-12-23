@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+  <li><p>If <var title="">target</var> is <span>in error reporting mode</span>, then abort these
+    steps; the error is <i title="concept-error-nothandled">not handled</i>.</p></li>
+ 
+    <li><p>Let <var title="">target</var> be <dfn>in error reporting mode</dfn>.</p></li>
+ 
+    <li><p>Let <var title="">message</var> be a user-agent-defined
+    string describing the error in a helpful manner.
+    <!--INSERT FINGERPRINT-->
+    </p></li>
+ 
++   <li><p>Let <var title="">error object</var> be the object that represents the error: in the case
++   of an uncaught exception, that would be the object that was thrown; in the case of a JavaScript
++   error that would be an <code>Error</code> object. If there is no corresponding object, then the
++   null value must be used instead.</p></li>
++
+    <li>
+ 
+     <p>Let <var title="">location</var> be an <span>absolute URL</span> that corresponds to the
+     resource from which <var title="">script</var> was obtained.</p>
+ 
+     <p class="note">The resource containing the script will typically be the file
+     from which the <code>Document</code> was parsed, e.g. for inline
+     <code>script</code> elements or <span>event handler content
+     attributes</span>; or the JavaScript file that the script was in,
+     for external scripts. Even for dynamically-generated scripts, user
+@@ -80286,40 +80291,43 @@ interface <dfn>NavigatorOnLine</dfn> {
+     <p class="note">User agents are similarly encouraged to keep careful track of the
+     original line numbers, even in the face of <code
+     title="dom-document-write">document.write()</code> calls mutating
+     the document as it is parsed, or <span>event handler content
+     attributes</span> spanning multiple lines.</p>
+ 
+    </li>
+ 
+    <li><p>If <var title="">script</var> has <span>muted errors</span>, then set <var
+    title="">message</var> to "<code title="">Script error.</code>", set <var
+-   title="">location</var> to the empty string, and set <var title="">line</var> and <var
+-   title="">col</var> to 0.</p></li>
++   title="">location</var> to the empty string, set <var title="">line</var> and <var
++   title="">col</var> to 0, and set <var title="">error object</var> to null.</p></li>
+ 
+    <li><p>Let <var title="">event</var> be a new <span
+    title="concept-events-trusted">trusted</span> <code>ErrorEvent</code> object that does not
+    bubble but is cancelable, and which has the event name <code
+    title="event-error">error</code>.</p></li>
+ 
+    <li><p>Initialize <var title="">event</var>'s <code
+    title="dom-ErrorEvent-message">message</code> attribute to <var title="">message</var>.</p></li>
+ 
+    <li><p>Initialize <var title="">event</var>'s <code
+    title="dom-ErrorEvent-filename">filename</code> attribute to <var title="">location</var>.</p></li>
+ 
+    <li><p>Initialize <var title="">event</var>'s <code
+    title="dom-ErrorEvent-lineno">lineno</code> attribute to <var title="">line</var>.</p></li>
+ 
+    <li><p>Initialize <var title="">event</var>'s <code
+    title="dom-ErrorEvent-column">column</code> attribute to <var title="">col</var>.</p></li>
+ 
++   <li><p>Initialize <var title="">event</var>'s <code
++   title="dom-ErrorEvent-object">error</code> attribute to <var title="">error object</var>.</p></li>
++
+    <li><p><span title="concept-event-dispatch">Dispatch</span> <var title="">event</var> at <var
+    title="">target</var>.</p></li>
+ 
+    <li><p>Let <var title="">target</var> no longer be <span>in error reporting mode</span>.</p></li>
+ 
+    <li><p>If <var title="">event</var> was canceled, then the error is <i
+    title="concept-error-handled">handled</i>. Otherwise, the error is <i
+    title="concept-error-nothandled">not handled</i>.</p>
+ 
+   </ol>
+@@ -80340,27 +80348,29 @@ interface <dfn>NavigatorOnLine</dfn> {
+ 
+ 
+   <h6>The <code>ErrorEvent</code> interface</h6>
+ 
+   <pre class="idl">[Constructor(DOMString type, optional <span>ErrorEventInit</span> eventInitDict)]
+ interface <dfn>ErrorEvent</dfn> : <span>Event</span> {
+   readonly attribute DOMString <span title="dom-ErrorEvent-message">message</span>;
+   readonly attribute DOMString <span title="dom-ErrorEvent-filename">filename</span>;
+   readonly attribute unsigned long <span title="dom-ErrorEvent-lineno">lineno</span>;
+   readonly attribute unsigned long <span title="dom-ErrorEvent-column">column</span>;
++  readonly attribute any <span title="dom-ErrorEvent-error">error</span>;
+ };
+ 
+ dictionary <dfn>ErrorEventInit</dfn> : <span>EventInit</span> {
+   DOMString message;
+   DOMString filename;
+   unsigned long lineno;
+   unsigned long column;
++  any error;
+ };</pre>
+ 
+   <p>The <dfn
+   title="dom-ErrorEvent-message"><code>message</code></dfn> attribute
+   must return the value it was initialized to. When the object is
+   created, this attribute must be initialized to the empty string. It
+   represents the error message.</p>
+ 
+   <p>The <dfn
+   title="dom-ErrorEvent-filename"><code>filename</code></dfn>
+@@ -80374,20 +80384,26 @@ dictionary <dfn>ErrorEventInit</dfn> : <span>EventInit</span> {
+   object is created, this attribute must be initialized to zero. It
+   represents the line number where the error occurred in the
+   script.</p>
+ 
+   <p>The <dfn title="dom-ErrorEvent-column"><code>column</code></dfn>
+   attribute must return the value it was initialized to. When the
+   object is created, this attribute must be initialized to zero. It
+   represents the column number where the error occurred in the
+   script.</p>
+ 
++  <p>The <dfn title="dom-ErrorEvent-error"><code>error</code></dfn>
++  attribute must return the value it was initialized to. When the
++  object is created, this attribute must be initialized to null.
++  Where appropriate, it is set to the object representing the error (e.g. the exception object in
++  the case of an uncaught DOM exception).</p>
++
+ 
+ 
+   <div class="impl">
+ 
+   <h4>Event loops</h4>
+ 
+   <h5>Definitions</h5>
+ 
+   <p>To coordinate events, user interaction, scripts, rendering, networking, and so forth, user
+   agents must use <dfn title="event loop">event loops</dfn> as described in this section.</p>
+@@ -81044,23 +81060,25 @@ currently this is unnecessary: http://www.w3.org/Bugs/Public/show_bug.cgi?id=119
+ 
+      <dt>Parameter list <var title="">FormalParameterList</var></dt>
+ 
+      <dd>
+ 
+       <dl class="switch">
+ 
+        <dt>If the attribute is the <code title="handler-onerror">onerror</code> attribute of
+        the <code>Window</code> object</dt>
+ 
+-       <dd>Let the function have four arguments, named <code title="">event</code>, <code
+-       title="">source</code>, <code title="">lineno</code>, and <code title="">column</code>.</dd>
++       <dd>Let the function have five arguments, named <code title="">event</code>, <code
++       title="">source</code>, <code title="">lineno</code>, <code title="">column</code>,
++       and <code title="">error</code>.</dd>
+        <!-- /column/ is new as of 2012; see https://www.w3.org/Bugs/Public/show_bug.cgi?id=13319 -->
++       <!-- /error/ is new as of 2013; see http://lists.w3.org/Archives/Public/public-whatwg-archive/2013Jul/0313.html -->
+ 
+        <dt>Otherwise</dt>
+ 
+        <dd>Let the function have a single argument called <code title="">event</code>.</dd>
+ 
+       </dl>
+ 
+      </dd>
+ 
+      <dt>Function body <var title="">FunctionBody</var></dt>
+@@ -81214,22 +81232,23 @@ currently this is unnecessary: http://www.w3.org/Bugs/Public/show_bug.cgi?id=119
+ 
+      <dt>If <var title="">E</var> is an <code>ErrorEvent</code> object and the <span title="event
+      handler IDL attributes">event handler IDL attribute</span>'s type is
+      <code>OnErrorEventHandler</code></dt>
+ 
+      <dd>
+ 
+       <p>Invoke <var title="">callback</var> with four arguments,
+       the first one having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-message">message</code> attribute,
+       the second having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-filename">filename</code> attribute,
+-      the third having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-lineno">lineno</code> attribute, and
++      the third having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-lineno">lineno</code> attribute,
+       the fourth having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-column">column</code> attribute,
++      the fifth having the value of <var title="">E</var>'s <code title="dom-ErrorEvent-error">error</code> attribute, and
+       with the <i title="dfn-callback-this-value">callback this value</i> set to <var
+       title="">E</var>'s <code title="dom-Event-currentTarget">currentTarget</code>. Let the return
+       value be <var title="">return value</var>. <a href="#refsWEBIDL">[WEBIDL]</a></p>
+ 
+      </dd>
+ 
+      <dt>Otherwise</dt>
+ 
+      <dd>
+ 
+@@ -81316,21 +81335,21 @@ typedef <span>EventHandlerNonNull</span>? <dfn>EventHandler</dfn>;</pre>
+   <p class="note">The return value of the function affects whether the event is canceled or not:
+   <span class="impl">as described above,</span> if the return value is false, the event is canceled
+   (except for <code class="event-mouseover">mouseover</code> events, where the return value has to
+   be true to cancel the event). With <code title="event-beforeunload">beforeunload</code> events,
+   the value is instead used to determine the message to show the user.</p>
+ 
+   <p>For historical reasons, the <code title="handler-onerror">onerror</code> handler has different
+   arguments:</p>
+ 
+   <pre class="idl">[TreatNonCallableAsNull]
+-callback <dfn>OnErrorEventHandlerNonNull</dfn> = any ((<span>Event</span> or DOMString) event, optional DOMString source, optional unsigned long lineno, optional unsigned long column);
++callback <dfn>OnErrorEventHandlerNonNull</dfn> = any ((<span>Event</span> or DOMString) event, optional DOMString source, optional unsigned long lineno, optional unsigned long column, optional any error);
+ typedef <span>OnErrorEventHandlerNonNull</span>? <dfn>OnErrorEventHandler</dfn>;</pre>
+ 
+   <p>Similarly, the <code title="handler-window-onbeforeunload">onbeforeunload</code> handler has a
+   different return value:</p>
+ 
+   <pre class="idl">[TreatNonCallableAsNull]
+ callback <dfn>OnBeforeUnloadEventHandlerNonNull</dfn> = DOMString (<span>Event</span> event);
+ typedef <span>OnBeforeUnloadEventHandlerNonNull</span>? <dfn>OnBeforeUnloadEventHandler</dfn>;</pre>
+ 
+   <!-- onreadystatechange is also defined specially, using [LenientThis]; see IDL -->
+@@ -89919,22 +89938,24 @@ worker.port.postMessage({ foo: 'structured', bar: ['data', 'also', 'possible']})
+   <!--START complete-->
+   </p>
+ 
+   <p>For dedicated workers, if the error is still <i title="concept-error-nothandled">not
+   handled</i> afterwards, the user
+   agent must <span>queue a task</span> to <span title="concept-event-fire">fire</span> a <span
+   title="concept-events-trusted">trusted</span> event that uses the <code>ErrorEvent</code>
+   interface, with the name <code title="event-error">error</code>, that doesn't bubble and is
+   cancelable, with its <code title="dom-ErrorEvent-message">message</code>, <code
+   title="dom-ErrorEvent-filename">filename</code>, <code
+-  title="dom-ErrorEvent-lineno">lineno</code>, and <code title="dom-ErrorEvent-column">column</code>
+-  attributes initialized appropriately, at the <code>Worker</code> object associated with the
++  title="dom-ErrorEvent-lineno">lineno</code>, <code title="dom-ErrorEvent-column">column</code>,
++  attributes initialized appropriately,
++  and with the <code title="dom-ErrorEvent-error">error</code> attribute initialized to null,
++  at the <code>Worker</code> object associated with the
+   worker. If the event is not canceled, the user agent must act as if the uncaught runtime script
+   error had occurred in the global scope that the <code>Worker</code> object is in, thus repeating
+   the entire runtime script error reporting process one level up.</p>
+ 
+   <p>If the implicit port connecting the worker to its <code>Worker</code> object has been
+   disentangled (i.e. if the parent worker has been terminated), then the user agent must act as if
+   the <code>Worker</code> object had no <code title="event-error">error</code> event handler and as
+   if that worker's <code title="handler-WorkerGlobalScope-onerror">onerror</code> attribute was
+   null, but must otherwise act as described above.</p>
+ 
+@@ -116567,20 +116588,21 @@ if (s = prompt('What is your name?')) {
+   Ido Green,
+   Ignacio Javier,
+   Ivan Enderlin,
+   Ivo Emanuel Gon&ccedil;alves,
+   J. King,
+   Jacob Davies,
+   Jacques Distler,
+   Jake Verbaten,
+   James Craig,
+   James Graham,
++  James Green,
+   James Justin Harrell,
+   James Kozianski,
+   James M Snell,
+   James Perrett,
+   James Robinson,
+   Jamie Lokier,
+   Janusz Majnert,
+   Jan-Klaas Kollhof,
+   Jason Duell,
+   Jason Kersey,
+</html>
